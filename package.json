@@ -1,7 +1,7 @@
 {
 	"name": "@fallsimply/themer",
 	"version": "1.0.1",
-	"main": "dist/index.mjs",
+	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "fallsimply",
 	"repository": "github:fallsimply/themer",
@@ -9,10 +9,6 @@
 	"devDependencies": {
 		"typescript": "^4.2.2"
 	},
-	"files": [
-		"dist",
-		"types"
-	],
 	"scripts": {
 		"build": "tsc"
 	}
