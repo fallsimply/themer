@@ -40,7 +40,7 @@ export default class {
     set theme(theme) {
         if (this._value === "system" && theme !== "system")
             window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", this._themeEventHandler);
-        localStorage.setItem("theme", theme ?? "system");
+        localStorage.setItem("theme", theme !== null && theme !== void 0 ? theme : "system");
         this.update();
     }
     get theme() {
