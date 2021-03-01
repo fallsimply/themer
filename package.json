@@ -1,11 +1,19 @@
 {
 	"name": "@fallsimply/themer",
 	"version": "1.0.0",
-	"main": "dist/index.js",
+	"main": "dist/index.mjs",
+	"types": "dist/index.d.ts",
 	"author": "fallsimply",
 	"repository": "github:fallsimply/themer",
 	"license": "MIT",
 	"devDependencies": {
-		"tsup": "^4.5.1"
+		"typescript": "^4.2.2"
+	},
+	"files": [
+		"dist",
+		"types"
+	],
+	"scripts": {
+		"build": "tsc"
 	}
 }
