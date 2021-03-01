@@ -1,0 +1,11 @@
+{
+	"name": "@fallsimply/themer",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"author": "fallsimply",
+	"repository": "github:fallsimply/themer",
+	"license": "MIT",
+	"devDependencies": {
+		"tsup": "^4.5.1"
+	}
+}
