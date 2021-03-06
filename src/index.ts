@@ -2,18 +2,17 @@ type themes = "light" | "dark"
 type mode = "system" | themes
 
 export default class {
-	private _value?: mode
+	private _value: mode
 	private _default: themes
 	private _query: MediaQueryList
 	private _root: Element
 
 	constructor(defaultTheme: themes = "light") {
-		console.log(this)
-		this.update()
 		this._default = defaultTheme
 		this._value = localStorage.getItem("theme") as mode ?? this._default
 		this._query = window.matchMedia("(prefers-color-scheme: dark)")
 		this._root = document.body as Element
+		this.update()
 	}
 
 	update() {
@@ -54,6 +53,7 @@ export default class {
 			this._query.removeEventListener("change", this._themeEventHandler)
 
 		localStorage.setItem("theme", theme ?? "system")
+		this._value = theme ?? "system"
 		this.update()
 	}
 

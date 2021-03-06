@@ -1,7 +1,7 @@
 declare type themes = "light" | "dark";
 declare type mode = "system" | themes;
 export default class {
-    private _value?;
+    private _value;
     private _default;
     private _query;
     private _root;
@@ -12,6 +12,7 @@ export default class {
     private _themeEventHandler;
     set theme(theme: mode);
     get theme(): mode;
+    setRoot(root: Element): void;
     private get _systemTheme();
 }
 export {};

@@ -1,12 +1,11 @@
 export default class {
     constructor(defaultTheme = "light") {
         var _a;
-        console.log(this);
-        this.update();
         this._default = defaultTheme;
         this._value = (_a = localStorage.getItem("theme")) !== null && _a !== void 0 ? _a : this._default;
         this._query = window.matchMedia("(prefers-color-scheme: dark)");
-        this._root = document.getRootNode().children[0];
+        this._root = document.body;
+        this.update();
     }
     update() {
         switch (this._value) {
@@ -40,6 +39,7 @@ export default class {
         else if (this._value === "system" && theme !== "system")
             this._query.removeEventListener("change", this._themeEventHandler);
         localStorage.setItem("theme", theme !== null && theme !== void 0 ? theme : "system");
+        this._value = theme !== null && theme !== void 0 ? theme : "system";
         this.update();
     }
     get theme() {
@@ -53,8 +53,11 @@ export default class {
                 return this._default;
         }
     }
+    setRoot(root) {
+        this._root = root;
+    }
     get _systemTheme() {
-        return window.matchMedia("(prefers-color-scheme: dark)")
+        return (window === null || window === void 0 ? void 0 : window.matchMedia("(prefers-color-scheme: dark)"))
             ? "dark"
             : "light";
     }
