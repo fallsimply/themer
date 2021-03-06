@@ -1,15 +1,17 @@
 declare type themes = "light" | "dark";
-declare type mode = "system" | themes | null;
+declare type mode = "system" | themes;
 export default class {
-    _value: mode;
-    _default: themes;
+    private _value?;
+    private _default;
+    private _query;
+    private _root;
     constructor(defaultTheme?: themes);
     update(): void;
     toggle(): void;
-    _handleDom(theme: themes): void;
-    _themeEventHandler(): void;
+    private _handleDom;
+    private _themeEventHandler;
     set theme(theme: mode);
     get theme(): mode;
-    get systemTheme(): "light" | "dark";
+    private get _systemTheme();
 }
 export {};

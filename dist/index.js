@@ -1,14 +1,17 @@
 export default class {
     constructor(defaultTheme = "light") {
-        this._value = null;
+        var _a;
+        console.log(this);
         this.update();
         this._default = defaultTheme;
+        this._value = (_a = localStorage.getItem("theme")) !== null && _a !== void 0 ? _a : this._default;
+        this._query = window.matchMedia("(prefers-color-scheme: dark)");
+        this._root = document.getRootNode().children[0];
     }
     update() {
-        this._value = localStorage.getItem("theme");
         switch (this._value) {
             case "system":
-                window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", this._themeEventHandler);
+                this._handleDom(this._systemTheme);
                 break;
             case "light":
             case "dark":
@@ -19,27 +22,23 @@ export default class {
         }
     }
     toggle() {
-        console.log(this.theme);
-        switch (this.theme) {
-            case "light":
-                this.theme = "dark";
-                break;
-            case "dark":
-                this.theme = "light";
-                console.log(this.theme);
-        }
+        this.theme = this.theme === "light"
+            ? "dark"
+            : "light";
     }
     _handleDom(theme) {
-        document.body.removeAttribute("light");
-        document.body.removeAttribute("dark");
-        document.body.setAttribute(theme, "");
+        this._root.removeAttribute("light");
+        this._root.removeAttribute("dark");
+        this._root.setAttribute(theme, "");
     }
     _themeEventHandler() {
-        this.theme = this.systemTheme;
+        this._value = this._systemTheme;
     }
     set theme(theme) {
-        if (this._value === "system" && theme !== "system")
-            window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", this._themeEventHandler);
+        if (this._value !== "system" && theme === "system")
+            this._query.addEventListener("change", this._themeEventHandler);
+        else if (this._value === "system" && theme !== "system")
+            this._query.removeEventListener("change", this._themeEventHandler);
         localStorage.setItem("theme", theme !== null && theme !== void 0 ? theme : "system");
         this.update();
     }
@@ -49,12 +48,12 @@ export default class {
             case "dark":
                 return this._value;
             case "system":
-                return this.systemTheme;
+                return this._systemTheme;
             default:
                 return this._default;
         }
     }
-    get systemTheme() {
+    get _systemTheme() {
         return window.matchMedia("(prefers-color-scheme: dark)")
             ? "dark"
             : "light";
