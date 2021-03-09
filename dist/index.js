@@ -4,7 +4,7 @@ export default class {
         this._default = defaultTheme;
         this._value = (_a = localStorage.getItem("theme")) !== null && _a !== void 0 ? _a : this._default;
         this._query = window.matchMedia("(prefers-color-scheme: dark)");
-        this._root = document.body;
+        this._root = document.documentElement;
         this.update();
     }
     update() {

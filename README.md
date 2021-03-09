@@ -5,10 +5,13 @@ alternative to `prefers-color-scheme` media queries that allows using themes bes
 
 sets an attribute on the body element - either `light` or `dark`
 
-## **before / after**
+# breaking changes
+version 2 uses the document's `html` element as the root instead of the `body` element 
 
-### **before**
-CSS:
+# **before / after**
+
+## **before**
+### CSS
 ``` css
 main {
 	color: black;
@@ -21,9 +24,20 @@ main {
 	}
 }
 ```
+### CSS Variables
+``` css
+:root {
+	--link: #00f;
+}
+@media (prefers-color-scheme: dark) {
+	:root[dark] {
+		--link: #f0f;
+	}
+}
+```
 
-### **after** 
-CSS:
+## **after** 
+### CSS
 ``` css
 main {
 	color: black;
@@ -31,12 +45,24 @@ main {
 }
 
 [dark] main {
+	
 	color: white;
 	background: black;
 }
 ```
 
-JS:
+### CSS with Variables
+``` css
+:root {
+	--link: #00f;
+}
+
+:root[dark] {
+	--link: #f0f;
+}
+```
+
+### JS
 ``` js
 import Themer from @fallsimply/themer
 window.themer = new Themer()

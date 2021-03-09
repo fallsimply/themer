@@ -11,7 +11,7 @@ export default class {
 		this._default = defaultTheme
 		this._value = localStorage.getItem("theme") as mode ?? this._default
 		this._query = window.matchMedia("(prefers-color-scheme: dark)")
-		this._root = document.body as Element
+		this._root = document.documentElement as Element
 		this.update()
 	}
 
