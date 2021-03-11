@@ -1,6 +1,7 @@
 export default class {
     constructor(defaultTheme = "light") {
         var _a;
+        this._themes = ["light", "dark"];
         this._default = defaultTheme;
         this._value = (_a = localStorage.getItem("theme")) !== null && _a !== void 0 ? _a : this._default;
         this._query = window.matchMedia("(prefers-color-scheme: dark)");
@@ -8,26 +9,27 @@ export default class {
         this.update();
     }
     update() {
-        switch (this._value) {
-            case "system":
-                this._handleDom(this._systemTheme);
-                break;
-            case "light":
-            case "dark":
-                this._handleDom(this._value);
-                break;
-            default:
-                localStorage.setItem("theme", "system");
-        }
+        if (this._value === "system")
+            this._domHandler(this._systemTheme);
+        else if (this._themes.includes(this._value))
+            this._domHandler(this._value);
+        else
+            this.theme = "system";
     }
     toggle() {
         this.theme = this.theme === "light"
             ? "dark"
             : "light";
     }
-    _handleDom(theme) {
-        this._root.removeAttribute("light");
-        this._root.removeAttribute("dark");
+    next() {
+        let idx = this._themes.indexOf(this.theme);
+        this.theme = this._themes[idx];
+    }
+    /*
+     * HANDLERS
+     */
+    _domHandler(theme) {
+        this._themes.forEach(theme => this._root.removeAttribute(theme));
         this._root.setAttribute(theme, "");
     }
     _themeEventHandler() {
@@ -43,22 +45,32 @@ export default class {
         this.update();
     }
     get theme() {
-        switch (this._value) {
-            case "light":
-            case "dark":
-                return this._value;
-            case "system":
-                return this._systemTheme;
-            default:
-                return this._default;
-        }
+        if (this._themes.includes(this._value))
+            return this._value;
+        else if (this._value === "system")
+            return this._systemTheme;
+        else
+            return this._default;
     }
-    setRoot(root) {
+    addThemes(name) {
+        this._themes.push(name);
+    }
+    set root(root) {
         this._root = root;
     }
     get _systemTheme() {
         return (window === null || window === void 0 ? void 0 : window.matchMedia("(prefers-color-scheme: dark)"))
             ? "dark"
             : "light";
+    }
+    /*
+     * CSS Custom Properties
+     */
+    setVar(name, value) {
+        this._root.style.setProperty(`--${name}`, value);
+    }
+    setVars(obj) {
+        for (const [name, value] of Object.entries(obj))
+            this.setVar(name, value);
     }
 }

@@ -1,32 +1,28 @@
-type themes = "light" | "dark"
-type mode = "system" | themes
+type Theme = "light" | "dark" | string
+type ColorScheme = "system" | Theme
 
 export default class {
-	private _value: mode
-	private _default: themes
+	private _value: ColorScheme
+	private _default: Theme
 	private _query: MediaQueryList
 	private _root: Element
+	private _themes: Array<Theme> = ["light", "dark"]
 
-	constructor(defaultTheme: themes = "light") {
+	constructor(defaultTheme: Theme = "light") {
 		this._default = defaultTheme
-		this._value = localStorage.getItem("theme") as mode ?? this._default
+		this._value = localStorage.getItem("theme") as ColorScheme ?? this._default
 		this._query = window.matchMedia("(prefers-color-scheme: dark)")
-		this._root = document.documentElement as Element
+		this._root  = document.documentElement as Element
 		this.update()
 	}
 
 	update() {
-		switch (this._value) {
-			case "system":
-				this._handleDom(this._systemTheme)
-				break
-			case "light":
-			case "dark":
-				this._handleDom(this._value)
-				break
-			default:
-				localStorage.setItem("theme", "system")
-		}
+		if (this._value === "system")
+			this._domHandler(this._systemTheme)
+		else if (this._themes.includes(this._value))
+			this._domHandler(this._value)
+		else
+			this.theme = "system"
 	}
 
 	toggle() {
@@ -35,10 +31,17 @@ export default class {
 			: "light"
 	}
 
+	next() {
+		let idx = this._themes.indexOf(this.theme as Theme)
+		this.theme = this._themes[idx]
+	}
 
-	private _handleDom(theme: themes) {
-		this._root.removeAttribute("light")
-		this._root.removeAttribute("dark")
+
+	/*
+	 * HANDLERS
+	 */
+	private _domHandler(theme: Theme) {
+		this._themes.forEach(theme => this._root.removeAttribute(theme))
 		this._root.setAttribute(theme, "")
 	}
 
@@ -46,7 +49,7 @@ export default class {
 		this._value = this._systemTheme
 	}
 
-	set theme(theme: mode) {
+	set theme(theme: ColorScheme) {
 		if (this._value !== "system" && theme === "system")
 			this._query.addEventListener("change", this._themeEventHandler)
 		else if (this._value === "system" && theme !== "system")
@@ -57,19 +60,20 @@ export default class {
 		this.update()
 	}
 
-	get theme(): mode {
-		switch (this._value) {
-			case "light":
-			case "dark":
-				return this._value
-			case "system":
-				return this._systemTheme
-			default:
-				return this._default
-		}
+	get theme(): ColorScheme {
+		if (this._themes.includes(<Theme>this._value))
+			return this._value
+		else if (this._value === "system")
+			return this._systemTheme
+		else
+			return this._default
 	}
 
-	setRoot(root: Element) {
+	addThemes(name: Theme) {
+		this._themes.push(name)
+	}
+
+	set root(root: Element) {
 		this._root = root
 	} 
 
@@ -77,5 +81,18 @@ export default class {
 		return window?.matchMedia("(prefers-color-scheme: dark)")
 			? "dark"
 			: "light"
+	}
+
+	/*
+	 * CSS Custom Properties
+	 */
+	setVar(name: string, value: string) {
+		(<HTMLElement>this._root).style.setProperty(`--${name}`, value)
+	}
+
+	setVars(obj: Record<string, string>) {
+		for (const [name, value] of Object.entries(obj))
+			this.setVar(name, value)
+
 	}
 }
