@@ -67,3 +67,23 @@ main {
 import Themer from @fallsimply/themer
 window.themer = new Themer()
 ```
+
+# additional themes shim
+place in a `.d.ts` shim file such as `shims-themer.d.ts`
+to add additional themes add a union type under `themes`
+``` ts
+import themer from "@fallsimply/themer";
+
+declare module '@fallsimply/themer' {
+	interface Options {
+		themes: "sepia" | "amoled"
+	}
+}
+
+declare global {
+	interface Window {
+		themer: themer
+	}
+}
+}
+```

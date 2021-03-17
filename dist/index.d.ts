@@ -1,4 +1,5 @@
-declare type Theme = "light" | "dark" | string;
+export declare interface Options extends Record<string, string> {}
+declare type Theme = "light" | "dark" | Options["themes"];
 declare type ColorScheme = "system" | Theme;
 export default class {
     private _value;
