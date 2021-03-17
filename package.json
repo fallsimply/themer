@@ -1,7 +1,7 @@
 {
 	"name": "@fallsimply/themer",
 	"author": "fallsimply",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"repository": "github:fallsimply/themer",
 	"license": "MIT",
 	"types": "dist/index.d.ts",
