@@ -61,8 +61,8 @@ export default class {
         this._root = root;
     }
     get _systemTheme() {
-        var _a, _b;
-        return ((_b = (_a = this._query) === null || _a === void 0 ? void 0 : _a.matches) !== null && _b !== void 0 ? _b : this._default === "dark")
+        var _a;
+        return ((_a = this._query) === null || _a === void 0 ? void 0 : _a.matches)
             ? "dark"
             : "light";
     }
