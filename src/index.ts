@@ -1,19 +1,24 @@
-export declare interface Options extends Record<string, string> {}
-type Theme = "light" | "dark" | Options["themes"]
+export declare interface Options extends Record<"theme", unknown> {}
+export type LiteralOf<L, T> = T extends L ? T : never
+export type LiteralExtension<T> = (T & {}) 
+
+type Theme = "light" | "dark" | LiteralOf<Options["theme"], string> | LiteralExtension<string>
 type ColorScheme = "system" | Theme
 
 export default class {
-	private _value: ColorScheme
+	private _value:   ColorScheme
 	private _default: Theme
-	private _query: MediaQueryList
-	private _root: Element
-	private _themes: Array<Theme> = ["light", "dark"]
+	private _query:   MediaQueryList
+	private _root:    HTMLElement
+	private _themes:  Array<Exclude<ColorScheme, "system">> = ["light", "dark"]
 
-	constructor(defaultTheme: Theme = "light") {
+	constructor(defaultTheme: Theme = "light", root: Element = document.documentElement) {
 		this._default = defaultTheme
-		this._value = localStorage.getItem("theme") as ColorScheme ?? this._default
-		this._query = window.matchMedia?.("(prefers-color-scheme: dark)")
-		this._root = document.documentElement as Element
+		this._value = localStorage.getItem("theme") as ColorScheme || this._default
+		this._query = (!!window.matchMedia) 
+			? window.matchMedia("(prefers-color-scheme: dark)")
+			: null
+		this._root = root as HTMLElement
 		this.update()
 	}
 
@@ -30,14 +35,11 @@ export default class {
 		this.theme = this.theme === "light" 
 			? "dark"
 			: "light"
-		this.theme
 	}
 
 	next() {
-		let idx = this._themes.indexOf(this.theme as Theme) + 1
-		if (idx > this._themes.length)
-			idx -= this._themes.length
-		this.theme = this._themes[idx]
+		let idx = this._themes.indexOf(this.theme) + 1
+		this.theme = this._themes[idx] || this._themes[0]
 	}
 
 	/*
@@ -55,18 +57,20 @@ export default class {
 	}
 
 	set theme(theme: ColorScheme) {
-		if (!!this._query && this._value !== "system" && theme === "system")
-			this._query.addEventListener("change", this._themeEventHandler)
-		else if (!!this._query && this._value === "system" && theme !== "system")
-			this._query.removeEventListener("change", this._themeEventHandler)
+		if(!!this._query) {
+			if (this._value !== theme && theme === "system")
+				this._query.addEventListener("change", this._themeEventHandler)
+			else if (this._value === theme && theme !== "system")
+				this._query.removeEventListener("change", this._themeEventHandler)
+		}
 
-		localStorage.setItem("theme", theme ?? "system")
-		this._value = theme ?? "system"
+		localStorage.setItem("theme", theme || "system")
+		this._value = theme || "system"
 		this.update()
 	}
 
 	get theme(): ColorScheme {
-		return (this._value === "system")
+		return this._value === "system"
 			? this._systemTheme
 			: this._value
 	}
@@ -75,25 +79,27 @@ export default class {
 		this._themes.push(name)
 	}
 
-	set root(root: Element) {
+	set root(root: HTMLElement) {
 		this._root = root
 	} 
 
 	private get _systemTheme() {
-		return this._query?.matches
-			? "dark"
-			: "light"
+		return !!this._query
+			? this._query.matches
+				? "dark"
+				: "light"
+			: this._default
 	}
 
 	/*
 	 * CSS Custom Properties
 	 */
-	setVar(name: string, value: string) {
-		(<HTMLElement>this._root).style.setProperty(`--${name}`, value)
+	setVar(name: string, value: string | number) {
+		this._root.style.setProperty(`--${name}`, "" + value)
 	}
 
-	setVars(obj: Record<string, string>) {
-		for (const [name, value] of Object.entries(obj))
-			this.setVar(name, value)
+	setVars(vars: Record<string, string | number>) {
+		for (const [k, v] of Object.entries(vars))
+			this.setVar(k, v)
 	}
 }

@@ -1,6 +1,8 @@
-export declare interface Options extends Record<string, string> {
+export declare interface Options extends Record<"theme", unknown> {
 }
-declare type Theme = "light" | "dark" | Options["themes"];
+export declare type LiteralOf<L, T> = T extends L ? T : never;
+export declare type LiteralExtension<T> = (T & {});
+declare type Theme = "light" | "dark" | LiteralOf<Options["theme"], string> | LiteralExtension<string>;
 declare type ColorScheme = "system" | Theme;
 export default class {
     private _value;
@@ -8,7 +10,7 @@ export default class {
     private _query;
     private _root;
     private _themes;
-    constructor(defaultTheme?: Theme);
+    constructor(defaultTheme?: Theme, root?: Element);
     update(): void;
     toggle(): void;
     next(): void;
@@ -17,9 +19,9 @@ export default class {
     set theme(theme: ColorScheme);
     get theme(): ColorScheme;
     addThemes(name: Theme): void;
-    set root(root: Element);
+    set root(root: HTMLElement);
     private get _systemTheme();
-    setVar(name: string, value: string): void;
-    setVars(obj: Record<string, string>): void;
+    setVar(name: string, value: string | number): void;
+    setVars(vars: Record<string, string | number>): void;
 }
 export {};

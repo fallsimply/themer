@@ -1,11 +1,12 @@
 export default class {
-    constructor(defaultTheme = "light") {
-        var _a, _b;
+    constructor(defaultTheme = "light", root = document.documentElement) {
         this._themes = ["light", "dark"];
         this._default = defaultTheme;
-        this._value = (_a = localStorage.getItem("theme")) !== null && _a !== void 0 ? _a : this._default;
-        this._query = (_b = window.matchMedia) === null || _b === void 0 ? void 0 : _b.call(window, "(prefers-color-scheme: dark)");
-        this._root = document.documentElement;
+        this._value = localStorage.getItem("theme") || this._default;
+        this._query = (!!window.matchMedia)
+            ? window.matchMedia("(prefers-color-scheme: dark)")
+            : null;
+        this._root = root;
         this.update();
     }
     update() {
@@ -20,13 +21,10 @@ export default class {
         this.theme = this.theme === "light"
             ? "dark"
             : "light";
-        this.theme;
     }
     next() {
         let idx = this._themes.indexOf(this.theme) + 1;
-        if (idx > this._themes.length)
-            idx -= this._themes.length;
-        this.theme = this._themes[idx];
+        this.theme = this._themes[idx] || this._themes[0];
     }
     /*
      * HANDLERS
@@ -41,16 +39,18 @@ export default class {
         this._value = this._systemTheme;
     }
     set theme(theme) {
-        if (!!this._query && this._value !== "system" && theme === "system")
-            this._query.addEventListener("change", this._themeEventHandler);
-        else if (!!this._query && this._value === "system" && theme !== "system")
-            this._query.removeEventListener("change", this._themeEventHandler);
-        localStorage.setItem("theme", theme !== null && theme !== void 0 ? theme : "system");
-        this._value = theme !== null && theme !== void 0 ? theme : "system";
+        if (!!this._query) {
+            if (this._value !== theme && theme === "system")
+                this._query.addEventListener("change", this._themeEventHandler);
+            else if (this._value === theme && theme !== "system")
+                this._query.removeEventListener("change", this._themeEventHandler);
+        }
+        localStorage.setItem("theme", theme || "system");
+        this._value = theme || "system";
         this.update();
     }
     get theme() {
-        return (this._value === "system")
+        return this._value === "system"
             ? this._systemTheme
             : this._value;
     }
@@ -61,19 +61,20 @@ export default class {
         this._root = root;
     }
     get _systemTheme() {
-        var _a;
-        return ((_a = this._query) === null || _a === void 0 ? void 0 : _a.matches)
-            ? "dark"
-            : "light";
+        return !!this._query
+            ? this._query.matches
+                ? "dark"
+                : "light"
+            : this._default;
     }
     /*
      * CSS Custom Properties
      */
     setVar(name, value) {
-        this._root.style.setProperty(`--${name}`, value);
+        this._root.style.setProperty(`--${name}`, "" + value);
     }
-    setVars(obj) {
-        for (const [name, value] of Object.entries(obj))
-            this.setVar(name, value);
+    setVars(vars) {
+        for (const [k, v] of Object.entries(vars))
+            this.setVar(k, v);
     }
 }
